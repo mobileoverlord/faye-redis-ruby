@@ -1,6 +1,8 @@
 require 'em-hiredis'
 require 'multi_json'
 
+$stdout.sync = true
+
 module Faye
   class Redis
 
@@ -22,6 +24,8 @@ module Faye
     def init
       return if @redis
 
+      puts @options
+
       uri    = @options[:uri]       || nil
       host   = @options[:host]      || DEFAULT_HOST
       port   = @options[:port]      || DEFAULT_PORT
@@ -30,11 +34,19 @@ module Faye
       gc     = @options[:gc]        || DEFAULT_GC
       @ns    = @options[:namespace] || ''
       socket = @options[:socket]    || nil
+      sentinels = @options[:sentinels] || nil
+      master_name = @options[:master_name] || nil
 
       if uri
         @redis = EventMachine::Hiredis.connect(uri)
       elsif socket
         @redis = EventMachine::Hiredis::Client.new(socket, nil, auth, db).connect
+      elsif sentinels
+        puts 'Sentinel Support'
+        @redis = EventMachine::Hiredis.connect_sentinel(:sentinels => sentinels,
+                                                        :master_name => master_name,
+                                                        :host => host,
+                                                        :port => port)
       else
         @redis = EventMachine::Hiredis::Client.new(host, port, auth, db).connect
       end
