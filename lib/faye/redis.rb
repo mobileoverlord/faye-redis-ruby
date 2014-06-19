@@ -42,11 +42,10 @@ module Faye
       elsif socket
         @redis = EventMachine::Hiredis::Client.new(socket, nil, auth, db).connect
       elsif sentinels
-        puts 'Sentinel Support'
-        @redis = EventMachine::Hiredis.connect_sentinel(:sentinels => sentinels,
+        @redis = EventMachine::Hiredis::Client.new(host, port, auth, db,:sentinels => sentinels,
                                                         :master_name => master_name,
                                                         :host => host,
-                                                        :port => port)
+                                                        :port => port).connect
       else
         @redis = EventMachine::Hiredis::Client.new(host, port, auth, db).connect
       end
