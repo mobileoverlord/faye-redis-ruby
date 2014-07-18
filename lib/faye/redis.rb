@@ -42,10 +42,9 @@ module Faye
       elsif socket
         @redis = EventMachine::Hiredis::Client.new(socket, nil, auth, db).connect
       elsif sentinels
-        @redis = EventMachine::Hiredis::Client.new(host, port, auth, db,:sentinels => sentinels,
-                                                        :master_name => master_name,
-                                                        :host => host,
-                                                        :port => port).connect
+        @redis = EM::Hiredis::Sentinel::RedisClient.new(:sentinels => sentinels,
+                                                    :master_name => master_name,
+                                                  ).connect
       else
         @redis = EventMachine::Hiredis::Client.new(host, port, auth, db).connect
       end
