@@ -1,5 +1,6 @@
 require 'em-hiredis'
 require 'multi_json'
+require 'em-hiredis-sentinel'
 
 module Faye
   class Redis
@@ -40,7 +41,6 @@ module Faye
       elsif socket
         @redis = EventMachine::Hiredis::Client.new(socket, nil, auth, db).connect
       elsif sentinels
-        require 'em-hiredis-sentinel'
         @redis = EM::Hiredis::Sentinel::RedisClient.new(:sentinels => sentinels,
                                                     :master_name => master_name,
                                                   ).connect(with_pubsub: true)
